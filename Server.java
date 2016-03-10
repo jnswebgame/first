@@ -6,24 +6,24 @@
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
- 
+
 
     public class Server
     {
         private static int clientId;
         private ArrayList<ClientThread> al;
         //private ServerGUI serverGui;
- 
+
         private int port;
         private boolean keepRunning;
 
         public Server(int port)
-        {            
-            this.port = port; 
+        {
+            this.port = port;
             al = new ArrayList<ClientThread>();
         }
 
-        public void start() 
+        public void start()
         {
             keepRunning = true;
             try
@@ -57,14 +57,14 @@ import java.util.ArrayList;
                     }
                 }
             } catch (Exception e)
-            {         
+            {
                 e.printStackTrace();
             }
         } catch (Exception e)
-        {            
+        {
             e.printStackTrace();
         }
-        
+
     } // end of start
 
 
@@ -97,9 +97,26 @@ import java.util.ArrayList;
         keepRunning = false;
     }
 
-    
-    // Used in case of logout button
-    
+    private synchronized void sendData(Player player)
+    {
+		for (int i = al.size() - 1; i >= 0; i--)
+		{
+			ClientThread ct = al.get(i);
+			if (!ct.writeData(player))
+			{
+				al.remove(i);
+				display("A user has disconnected");
+			}
+		}
+
+	}
+
+
+    private void display(String message)
+    {
+		System.out.println(message);
+	}
+
     class ClientThread extends Thread
     {
         Socket sock;
@@ -107,7 +124,7 @@ import java.util.ArrayList;
         ObjectOutputStream oos;
         int id;
         String userName;
-        MyMessage myMessage;
+        Player player;
         String date;
 
         ClientThread(Socket sock)
@@ -119,18 +136,33 @@ import java.util.ArrayList;
             {
                 oos = new ObjectOutputStream(sock.getOutputStream());
                 ois = new ObjectInputStream(sock.getInputStream());
-                int inInt = ois.readInt();
+                userName = (String) ois.readObject();
+                display(userName + " has connected");
+                //int inInt = ois.readInt();
                 //int outInt = oos.writeInt();
             } catch (Exception e)
             {
                 e.printStackTrace();
                 return;
-            }            
+            }
         }
 
         public void run()
         {
-            boolean keepRunning = true;            
+            boolean keepRunning = true;
+            while(true)
+            {
+				try
+				{
+					player = (Player) ois.readObject();
+				} catch (Exception e)
+				{
+					display("Error reading data in run");
+					break;
+				}
+				System.out.println(player.getX());
+				sendData(player);
+			}
         }
 
         private void close()
@@ -145,7 +177,25 @@ import java.util.ArrayList;
                 e.printStackTrace();
             }
         }
+
+        private boolean writeData(Player player)
+        {
+			if (!sock.isConnected())
+			{
+				close();
+				return false;
+			}
+			try
+			{
+				oos.writeObject(player);
+			} catch (Exception e)
+			{
+				display("Error sending info");
+			}
+			return true;
+		}
+
     }
 }
 
-    
+
