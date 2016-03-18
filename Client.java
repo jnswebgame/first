@@ -9,10 +9,12 @@ public class Client
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
 	private Socket socket;
+	private ArrayList<Player> pl;
 
 	private GameGUI gg;
 	private String server, userName;
 	private int port;
+	private int clientId;
 
 	public String getUsername() { return userName; }
 
@@ -50,17 +52,20 @@ public class Client
 			return false;
 		}
 
-		new ListenToServer().start();
+
 
 		try
 		{
+			// Send the server your username, it will send back your client id
 			oos.writeObject(userName);
+			clientId = (int) ois.readObject();
 		} catch (Exception e)
 		{
 			display("Error writing name");
 			disconnect();
 			return false;
 		}
+		new ListenToServer().start();
 		return true;
 	}
 
@@ -79,10 +84,24 @@ public class Client
 	{
 		try
 		{
-			oos.writeObject(player);
+			player.setId(clientId);
+
+			oos.writeUnshared(player);
+
 		} catch (Exception e)
 		{
 			display("Error writing to server");
+		}
+	}
+	void sendData(GameEvent event)
+	{
+		try
+		{
+			event.setId(clientId);
+			oos.writeUnshared(event);
+		} catch (Exception ex)
+		{
+			display("Error writing event to server");
 		}
 	}
 
@@ -101,6 +120,11 @@ public class Client
 		}
 	}
 
+	public int getId()
+	{
+		return clientId;
+	}
+
 	class ListenToServer extends Thread
 	{
 		public void run()
@@ -109,14 +133,17 @@ public class Client
 			{
 				try
 				{
-					Player play = (Player) ois.readObject();
-
-					if (gg == null)
+					Object o = ois.readObject();
+					//Player newPlayer = (Player) ois.readObject();
+					//gg.append(newPlayer);
+					if (o instanceof Player)
 					{
-						String message = "X = " + play.getX() + " Y = " + play.getY();
-					} else
+						Player newPlayer = (Player)o;
+						gg.append(newPlayer);
+					} else if (o instanceof GameEvent)
 					{
-						gg.append(play);
+						GameEvent event = (GameEvent)o;
+						gg.append(event);
 					}
 				} catch (Exception e)
 				{

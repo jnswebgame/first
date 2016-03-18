@@ -2,6 +2,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 
 public class GameGUI
@@ -11,26 +12,34 @@ public class GameGUI
 	private Client client;
 	private int defaultPort;
 	private String defaultHost;
+	private MoveToMouse panel;
+	private Player thisPlayer;
 
 
 	GameGUI(String host, int port)
 	{
 		String userName = "Default";
+		thisPlayer = new Player();
 
 		frame = new JFrame("Game client");
 		defaultPort = port;
 		defaultHost = host;
 		client = new Client(defaultHost, defaultPort, userName, this);
 
-		JPanel panel = new JPanel();
-		panel.setBackground(Color.BLUE);
+		//JPanel panel = new JPanel();
+		panel = new MoveToMouse();
+
+
+		//panel.setBackground(Color.BLUE);
 		panel.addMouseListener(new MouseAdapter()
 		{
 			public void mouseClicked(MouseEvent e)
 			{
 				int x = e.getX();
 				int y = e.getY();
-				client.sendData(new Player(x, y));
+				thisPlayer.setDestination(x, y);
+				//client.sendData(thisPlayer);
+				client.sendData(new GameEvent(x, y));
 			}
 		});
 
@@ -38,10 +47,13 @@ public class GameGUI
 		frame.add(panel);
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(800, 800);
+		frame.setSize(500, 500);
 		frame.setVisible(true);
 
+		//frame.pack();
 		client.start();
+		panel.setId(client.getId());
+		thisPlayer.setId(client.getId());
 	}
 
 	public static void main(String[] args)
@@ -49,9 +61,20 @@ public class GameGUI
 		GameGUI game = new GameGUI("localhost", 3484);
 	}
 
-	public void append(Player play)
+	public void append(Player player)
 	{
+		panel.update(player);
+	}
 
+	public void append(GameEvent event)
+	{
+		panel.update(event);
+	}
+
+	public void append(ArrayList<Player> pl)
+	{
+		ArrayList<Player> playList = new ArrayList<Player>(pl);
+		panel.update(playList);
 	}
 
 	public void append(String str)
@@ -61,7 +84,7 @@ public class GameGUI
 
 	public void connectionFailed()
 	{
-
+		connected = false;
 	}
 
 

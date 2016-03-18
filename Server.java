@@ -12,6 +12,7 @@ import java.util.ArrayList;
     {
         private static int clientId;
         private ArrayList<ClientThread> al;
+        private ArrayList<Player> pl;
         //private ServerGUI serverGui;
 
         private int port;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
         {
             this.port = port;
             al = new ArrayList<ClientThread>();
+            pl = new ArrayList<Player>();
         }
 
         public void start()
@@ -97,6 +99,20 @@ import java.util.ArrayList;
         keepRunning = false;
     }
 
+    private synchronized void sendData(GameEvent event)
+    {
+		for (int i = al.size() - 1; i >= 0; i--)
+		{
+			ClientThread ct = al.get(i);
+			if (!ct.writeData(event))
+			{
+				al.remove(i);
+				display("A user has disconnected");
+			}
+		}
+
+	}
+
     private synchronized void sendData(Player player)
     {
 		for (int i = al.size() - 1; i >= 0; i--)
@@ -117,14 +133,27 @@ import java.util.ArrayList;
 		System.out.println(message);
 	}
 
+	synchronized void remove(int id)
+	{
+		for (int i = 0; i < al.size(); i++)
+		{
+			ClientThread ct = al.get(i);
+			if (ct.id == id)
+			{
+				al.remove(i);
+				return;
+			}
+		}
+	}
+
     class ClientThread extends Thread
     {
         Socket sock;
         ObjectInputStream ois;
         ObjectOutputStream oos;
         int id;
+
         String userName;
-        Player player;
         String date;
 
         ClientThread(Socket sock)
@@ -138,8 +167,7 @@ import java.util.ArrayList;
                 ois = new ObjectInputStream(sock.getInputStream());
                 userName = (String) ois.readObject();
                 display(userName + " has connected");
-                //int inInt = ois.readInt();
-                //int outInt = oos.writeInt();
+                oos.writeObject(id);
             } catch (Exception e)
             {
                 e.printStackTrace();
@@ -149,20 +177,37 @@ import java.util.ArrayList;
 
         public void run()
         {
-            boolean keepRunning = true;
+            boolean updated = false;
+            Player player2;
             while(true)
             {
 				try
 				{
-					player = (Player) ois.readObject();
+					//player2 = (Player) ois.readObject();
+					//player2.setId(id);
+					//sendData(player2);
+					Object object = ois.readObject();
+					if (object instanceof Player)
+					{
+						Player play = (Player)object;
+						play.setId(id);
+						sendData(play);
+					} else if (object instanceof GameEvent)
+					{
+						GameEvent event = (GameEvent)object;
+						event.setId(id);
+						sendData(event);
+					}
 				} catch (Exception e)
 				{
 					display("Error reading data in run");
 					break;
 				}
-				System.out.println(player.getX());
-				sendData(player);
+
+
 			}
+			remove(id);
+			close();
         }
 
         private void close()
@@ -178,6 +223,24 @@ import java.util.ArrayList;
             }
         }
 
+        private boolean writeData(GameEvent e)
+        {
+			if (!sock.isConnected())
+			{
+				close();
+				return false;
+			}
+			try
+			{
+				oos.writeUnshared(e);
+			} catch (Exception ex)
+			{
+				display("Error sending event");
+			}
+			return true;
+
+		}
+
         private boolean writeData(Player player)
         {
 			if (!sock.isConnected())
@@ -187,7 +250,10 @@ import java.util.ArrayList;
 			}
 			try
 			{
-				oos.writeObject(player);
+				// Write unshared so it sends the correct object, without
+				// unshared it see's that it's already send that object once
+				// and doesn't send it again
+				oos.writeUnshared(player);
 			} catch (Exception e)
 			{
 				display("Error sending info");
