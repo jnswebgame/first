@@ -59,6 +59,9 @@ public class Client
 			// Send the server your username, it will send back your client id
 			oos.writeObject(userName);
 			clientId = (int) ois.readObject();
+			Player new_player = new Player();
+			new_player.setId(clientId);
+			gg.append(new_player);
 		} catch (Exception e)
 		{
 			display("Error writing name");
@@ -144,6 +147,9 @@ public class Client
 					{
 						GameEvent event = (GameEvent)o;
 						gg.append(event);
+					} else if (o instanceof Integer)
+					{
+						System.out.println("We got an int!");
 					}
 				} catch (Exception e)
 				{

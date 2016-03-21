@@ -168,6 +168,9 @@ import java.util.ArrayList;
                 userName = (String) ois.readObject();
                 display(userName + " has connected");
                 oos.writeObject(id);
+                GameEvent event = new GameEvent(50, 50);
+                event.setId(id);
+                sendData(event);
             } catch (Exception e)
             {
                 e.printStackTrace();
