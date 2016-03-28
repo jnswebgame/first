@@ -61,7 +61,7 @@ public class Player implements Serializable
 	{
 		xDistance = (xDestination - xCurrent);
 		yDistance = (yDestination - yCurrent);
-		if(xDistance == 0 && yDistance == 0)
+		if(xDistance < velocity && yDistance < velocity)
 		{
 			xVel = 0;
 			yVel = 0;
