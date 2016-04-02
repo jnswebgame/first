@@ -181,11 +181,16 @@ import java.util.ArrayList;
         public void run()
         {
             boolean updated = false;
+            int goldTimer = 0;
             Player player2;
             while(true)
             {
 				try
 				{
+                    if(goldTimer == 10)
+                    {
+                        GameEvent event = new GameEvent() //this is how far i made it. i'm lost here. how do let the program know its of the gold class?
+                    }
 					//player2 = (Player) ois.readObject();
 					//player2.setId(id);
 					//sendData(player2);

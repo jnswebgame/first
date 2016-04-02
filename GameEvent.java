@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class GameEvent implements Serializable
 {
-	enum EventType { PLAYER_MOVEMENT };
+	enum EventType { PLAYER_MOVEMENT, GOLD_SPAWN };
 	private int move_to_x, move_to_y, player_id;
 
 	private EventType event_type;
@@ -24,6 +24,13 @@ public class GameEvent implements Serializable
 		move_to_y = y;
 		event_type = EventType.PLAYER_MOVEMENT;
 	}
+	
+	public GameEvent(int x, int y, GameEvent e)
+	{
+		move_to_x = x;
+		move_to_y = y;
+		event_type = EventType.GOLD_SPAWN;
+	}	
 
 
 
