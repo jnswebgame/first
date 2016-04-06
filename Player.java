@@ -5,6 +5,7 @@ import java.awt.*;
 
 public class Player implements Serializable
 {
+	private int goldCount = 0;
 	private int x, y, id;
 	int xCurrent = 50, yCurrent = 50, xDestination = 50, yDestination = 50;
 	private int xDistance = 0, yDistance = 0, xVel = 0, yVel = 0;
