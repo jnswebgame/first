@@ -25,11 +25,11 @@ public class GameEvent implements Serializable
 		event_type = EventType.PLAYER_MOVEMENT;
 	}
 	
-	public GameEvent(int x, int y, GameEvent e)
+	public GameEvent(int x, int y, EventType event)
 	{
 		move_to_x = x;
 		move_to_y = y;
-		event_type = EventType.GOLD_SPAWN;
+		event_type = event;
 	}	
 
 

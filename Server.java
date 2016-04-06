@@ -6,9 +6,13 @@
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import javax.swing.Timer;
+import javax.swing.*;
+import java.awt.event.*;
+import java.util.Random;
 
 
-    public class Server
+    public class Server implements ActionListener
     {
         private static int clientId;
         private ArrayList<ClientThread> al;
@@ -17,6 +21,9 @@ import java.util.ArrayList;
 
         private int port;
         private boolean keepRunning;
+
+        Random random = new Random();
+        private Timer timer;
 
         public Server(int port)
         {
@@ -27,6 +34,8 @@ import java.util.ArrayList;
 
         public void start()
         {
+            timer = new Timer(30000, this);
+            timer.start();
             keepRunning = true;
             try
             {
@@ -181,16 +190,11 @@ import java.util.ArrayList;
         public void run()
         {
             boolean updated = false;
-            int goldTimer = 0;
             Player player2;
             while(true)
             {
 				try
 				{
-                    if(goldTimer == 10)
-                    {
-                        GameEvent event = new GameEvent() //this is how far i made it. i'm lost here. how do let the program know its of the gold class?
-                    }
 					//player2 = (Player) ois.readObject();
 					//player2.setId(id);
 					//sendData(player2);
@@ -268,8 +272,14 @@ import java.util.ArrayList;
 			}
 			return true;
 		}
-
     }
+        public void actionPerformed(ActionEvent e)
+        {
+            int x = random.nextInt(501);
+            int y = random.nextInt(501);
+            GameEvent goldSpawn = new GameEvent(x, y, GameEvent.EventType.GOLD_SPAWN);
+            sendData(goldSpawn);
+        }    
 }
 
 
