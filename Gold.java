@@ -6,17 +6,18 @@ import java.awt.*;
 public class Gold implements Serializable
 {
 	private int x, y, id;
-	Random = random;
+	//Random = random;
 
 	public String toString()
 	{
 		return "x: " + x + " y: " + y + " ID: " + id;
 	}
 
-	public Gold()
+	public Gold() {}
+	public Gold(int x, int y)
 	{
-		x = random.nextInt(501);
-		y = random.nextInt(501);
+		this.x = x;
+		this.y = y;
 	}
 
 	public void paintUnit(Graphics g)

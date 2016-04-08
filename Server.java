@@ -14,7 +14,7 @@ import java.util.Random;
 
     public class Server implements ActionListener
     {
-        private static int clientId;
+        private static int clientId, total_gold;
         private ArrayList<ClientThread> al;
         private ArrayList<Player> pl;
         //private ServerGUI serverGui;
@@ -30,6 +30,8 @@ import java.util.Random;
             this.port = port;
             al = new ArrayList<ClientThread>();
             pl = new ArrayList<Player>();
+            clientId = 0;
+            total_gold = 0;
         }
 
         public void start()
@@ -207,12 +209,12 @@ import java.util.Random;
 					} else if (object instanceof GameEvent)
 					{
 						GameEvent event = (GameEvent)object;
-						event.setId(id);
+						//event.setId(id);
 						sendData(event);
 					}
 				} catch (Exception e)
 				{
-					display("Error reading data in run");
+					display("A player has Disconnected!");
 					break;
 				}
 
@@ -273,13 +275,17 @@ import java.util.Random;
 			return true;
 		}
     }
-        public void actionPerformed(ActionEvent e)
-        {
-            int x = random.nextInt(501);
-            int y = random.nextInt(501);
-            GameEvent goldSpawn = new GameEvent(x, y, GameEvent.EventType.GOLD_SPAWN);
-            sendData(goldSpawn);
-        }    
+    public void actionPerformed(ActionEvent e)
+    {
+		if (total_gold < 5)
+		{
+        	int x = random.nextInt(501);
+        	int y = random.nextInt(501);
+        	GameEvent goldSpawn = new GameEvent(x, y, GameEvent.EventType.GOLD_SPAWN);
+        	goldSpawn.setId(++total_gold);
+        	sendData(goldSpawn);
+		}
+    }
 }
 
 

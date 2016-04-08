@@ -4,9 +4,10 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class MoveToMouse extends JPanel implements MouseListener, ActionListener
+public class MoveToMouse extends JPanel implements ActionListener //, MouseListener
 {
 	private ArrayList<Player> players;
+	private ArrayList<Gold> golds;
 	private int localId = -1;
 	Player localPlayer;
 
@@ -23,7 +24,8 @@ public class MoveToMouse extends JPanel implements MouseListener, ActionListener
 	{
 		localPlayer = new Player();
 		players = new ArrayList<Player>();
-		addMouseListener(this);
+		golds = new ArrayList<Gold>();
+		//addMouseListener(this);
 		timer = new Timer(50, this);
 		timer.start();
 	}
@@ -37,20 +39,42 @@ public class MoveToMouse extends JPanel implements MouseListener, ActionListener
 	{
 		boolean found = false;
 
-		for (int i = 0; i < players.size(); i++)
+		// Gold
+		if (event.getEventType() == GameEvent.EventType.GOLD_SPAWN)
 		{
-			if (event.getId() == players.get(i).getId())
+			for (int i = 0; i < golds.size(); i++)
 			{
-				players.get(i).xDestination = event.getX();
-				players.get(i).yDestination = event.getY();
-				found = true;
+				if (event.getId() == golds.get(i).getId())
+				{
+					golds.get(i).setX(event.getX());
+					golds.get(i).setY(event.getY());
+					found = true;
+				}
+
 			}
-		}
-		if (!found)
+			if (!found)
+			{
+				Gold new_gold = new Gold(event.getX(), event.getY());
+				new_gold.setId(event.getId());
+				golds.add(new_gold);
+			}
+		} else // Player
 		{
-			Player new_player = new Player(event.getX(), event.getY());
-			new_player.setId(event.getId());
-			players.add(new_player);
+			for (int i = 0; i < players.size(); i++)
+			{
+				if (event.getId() == players.get(i).getId())
+				{
+					players.get(i).xDestination = event.getX();
+					players.get(i).yDestination = event.getY();
+					found = true;
+				}
+			}
+			if (!found)
+			{
+				Player new_player = new Player(event.getX(), event.getY());
+				new_player.setId(event.getId());
+				players.add(new_player);
+			}
 		}
 
 	}
@@ -104,6 +128,10 @@ public class MoveToMouse extends JPanel implements MouseListener, ActionListener
 		{
 			players.get(i).paintUnit(g);
 		}
+		for (int i = 0; i < golds.size(); i++)
+		{
+			golds.get(i).paintUnit(g);
+		}
 	}
 
 	public void actionPerformed(ActionEvent e)
@@ -111,14 +139,16 @@ public class MoveToMouse extends JPanel implements MouseListener, ActionListener
 		repaint();
 	}
 
+	/*
 	public void mousePressed(MouseEvent e)
 	{
-		int x = e.getX();
-		int y = e.getY();
+		//int x = e.getX();
+		//int y = e.getY();
 	}
 
 	public void mouseReleased(MouseEvent e){}
 	public void mouseClicked(MouseEvent e){}
 	public void mouseEntered(MouseEvent e){}
 	public void mouseExited(MouseEvent e){}
+	*/
 }

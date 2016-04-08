@@ -62,7 +62,8 @@ public class Player implements Serializable
 	{
 		xDistance = (xDestination - xCurrent);
 		yDistance = (yDestination - yCurrent);
-		if(xDistance < velocity && yDistance < velocity)
+		//if(xDistance < velocity && yDistance < velocity)
+		if (xDistance == 0 && yDistance == 0)
 		{
 			xVel = 0;
 			yVel = 0;
@@ -73,8 +74,16 @@ public class Player implements Serializable
 			yVel = (int)((velocity * yDistance) / (Math.abs(xDistance) + Math.abs(yDistance)));
 		}
 
-		xCurrent += xVel;
-		yCurrent += yVel;
+		// This fixes the jumping around at destination problem
+		if (Math.abs(xDistance) < velocity && Math.abs(yDistance) < velocity)
+		{
+			xCurrent = xDestination;
+			yCurrent = yDestination;
+		} else
+		{
+			xCurrent += xVel;
+			yCurrent += yVel;
+		}
 	}
 
 	public Player(int x, int y)
