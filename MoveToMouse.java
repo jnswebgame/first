@@ -10,6 +10,7 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 	private ArrayList<Gold> golds;
 	private int localId = -1;
 	Player localPlayer;
+	GameGUI gui;
 
 	public int velocity = 7;
 
@@ -20,13 +21,14 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 		localId = id;
 	}
 
-	public MoveToMouse()
+	public MoveToMouse(GameGUI gui)
 	{
+		this.gui = gui;
 		localPlayer = new Player();
 		players = new ArrayList<Player>();
 		golds = new ArrayList<Gold>();
 		//addMouseListener(this);
-		timer = new Timer(50, this);
+		timer = new Timer(25, this);
 		timer.start();
 	}
 
@@ -39,8 +41,20 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 	{
 		boolean found = false;
 
-		// Gold
-		if (event.getEventType() == GameEvent.EventType.GOLD_SPAWN)
+		if (event.getEventType() == GameEvent.EventType.GOLD_TAKEN)
+		{
+			for (int i = 0; i < golds.size(); i++)
+			{
+				// I believe problem may be here
+				if (event.getGoldId() == golds.get(i).getId())
+				{
+					golds.remove(i);
+					break;
+				}
+			}
+
+
+		} else if (event.getEventType() == GameEvent.EventType.GOLD_SPAWN)
 		{
 			for (int i = 0; i < golds.size(); i++)
 			{
@@ -64,6 +78,10 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 			{
 				if (event.getId() == players.get(i).getId())
 				{
+					if (players.get(i).getId() == localId)
+					{
+						localPlayer = players.get(i);
+					}
 					players.get(i).xDestination = event.getX();
 					players.get(i).yDestination = event.getY();
 					found = true;
@@ -89,6 +107,11 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 				//System.out.println("i = " + i + "has equal ids of " + pl.get(i).getId());
 				//Player updatePlayer = new Player(player2);
 				Player current_player = players.get(i);
+
+				if (current_player.getId() == localId)
+				{
+					localPlayer = current_player;
+				}
 
 				if (current_player.xDestination != player.xDestination ||
 					current_player.yDestination != player.yDestination)
@@ -134,8 +157,27 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 		}
 	}
 
+	public void checkGold()
+	{
+		Rectangle current_player = localPlayer.getBounds();
+
+		for (int i = 0; i < golds.size(); i++)
+		{
+			Rectangle gold_rect = golds.get(i).getBounds();
+			if (current_player.intersects(gold_rect))
+			{
+				//localPlayer.addGold(1);
+				gui.sendGoldTaken(golds.get(i));
+				golds.remove(i);
+
+			}
+
+		}
+	}
+
 	public void actionPerformed(ActionEvent e)
 	{
+		checkGold();
 		repaint();
 	}
 

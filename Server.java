@@ -17,6 +17,7 @@ import java.util.Random;
         private static int clientId, total_gold;
         private ArrayList<ClientThread> al;
         private ArrayList<Player> pl;
+        boolean [] gold_ids = { false, false, false, false, false};
         //private ServerGUI serverGui;
 
         private int port;
@@ -210,6 +211,10 @@ import java.util.Random;
 					{
 						GameEvent event = (GameEvent)object;
 						//event.setId(id);
+						if (event.getEventType() == GameEvent.EventType.GOLD_TAKEN)
+						{
+							removeGold(event);
+						}
 						sendData(event);
 					}
 				} catch (Exception e)
@@ -275,6 +280,15 @@ import java.util.Random;
 			return true;
 		}
     }
+
+    public void removeGold(GameEvent e)
+    {
+		int remove_id = e.getGoldId();
+		total_gold--;
+		gold_ids[remove_id-1] = false;
+
+	}
+
     public void actionPerformed(ActionEvent e)
     {
 		if (total_gold < 5)
@@ -282,7 +296,16 @@ import java.util.Random;
         	int x = random.nextInt(501);
         	int y = random.nextInt(501);
         	GameEvent goldSpawn = new GameEvent(x, y, GameEvent.EventType.GOLD_SPAWN);
-        	goldSpawn.setId(++total_gold);
+        	total_gold++;
+        	for (int i = 0; i < gold_ids.length; i++)
+        	{
+				if (!gold_ids[i])
+				{
+					goldSpawn.setId(i+1);
+					gold_ids[i] = true;
+				}
+			}
+        	//goldSpawn.setId(++total_gold);
         	sendData(goldSpawn);
 		}
     }

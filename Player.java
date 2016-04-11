@@ -5,7 +5,7 @@ import java.awt.*;
 
 public class Player implements Serializable
 {
-	private int goldCount = 0;
+	private int goldCount;
 	private int x, y, id;
 	int xCurrent = 50, yCurrent = 50, xDestination = 50, yDestination = 50;
 	private int xDistance = 0, yDistance = 0, xVel = 0, yVel = 0;
@@ -17,9 +17,21 @@ public class Player implements Serializable
 		return "xCurrent: " + xCurrent + " yCurrent" + yCurrent + " xDest " + xDestination + " ID " + id;
 	}
 
+	public Rectangle getBounds()
+	{
+		return new Rectangle(xCurrent-10, yCurrent-10, 20, 20);
+	}
+
+	public void addGold(int i)
+	{
+		//goldCount += i;
+		//System.out.println("You now have " + goldCount + " gold");
+	}
+
 	// Copy constructor
 	public Player(Player p)
 	{
+		goldCount = p.goldCount;
 		xCurrent = p.xCurrent;
 		yCurrent = p.yCurrent;
 		xDestination = p.xDestination;
@@ -90,10 +102,12 @@ public class Player implements Serializable
 	{
 		this.xDestination = x;
 		this.yDestination = y;
+		goldCount = 0;
 	}
 	public Player()
 	{
 		x = 0; y = 0;
+		goldCount = 0;
 	}
 	public int getX()
 	{

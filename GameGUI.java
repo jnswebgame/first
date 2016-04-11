@@ -14,6 +14,7 @@ public class GameGUI
 	private String defaultHost;
 	private MoveToMouse panel;
 	private Player thisPlayer;
+	private int clientId = 0;
 
 
 	GameGUI(String host, int port)
@@ -27,7 +28,7 @@ public class GameGUI
 		client = new Client(defaultHost, defaultPort, userName, this);
 
 		//JPanel panel = new JPanel();
-		panel = new MoveToMouse();
+		panel = new MoveToMouse(this);
 
 
 		//panel.setBackground(Color.BLUE);
@@ -54,6 +55,20 @@ public class GameGUI
 		client.start();
 		panel.setId(client.getId());
 		thisPlayer.setId(client.getId());
+	}
+
+	public void sendGoldTaken(Gold gold)
+	{
+		GameEvent gold_taken = new GameEvent(gold.getX(), gold.getY(), GameEvent.EventType.GOLD_TAKEN);
+		gold_taken.setId(clientId);
+		gold_taken.setGoldId(gold.getId());
+		client.sendData(gold_taken);
+	}
+
+	public void setId(int id)
+	{
+		clientId = id;
+		panel.setId(id);
 	}
 
 	public static void main(String[] args)

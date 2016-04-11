@@ -32,6 +32,9 @@ public class Gold implements Serializable
 	public void setY(int y) { this.y = y; }
 	public void setId(int id) { this.id = id; }
 	public int getId() { return id; }
-
+	public Rectangle getBounds()
+	{
+		return new Rectangle(x-7, y-10, 14, 20);
+	}
 
 }

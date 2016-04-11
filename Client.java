@@ -61,6 +61,7 @@ public class Client
 			clientId = (int) ois.readObject();
 			Player new_player = new Player();
 			new_player.setId(clientId);
+			gg.setId(clientId);
 			gg.append(new_player);
 		} catch (Exception e)
 		{
@@ -96,6 +97,9 @@ public class Client
 			display("Error writing to server");
 		}
 	}
+
+
+
 	void sendData(GameEvent event)
 	{
 		try
