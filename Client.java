@@ -104,7 +104,10 @@ public class Client
 	{
 		try
 		{
-			event.setId(clientId);
+			if (event.getId() <= 0)
+			{
+				event.setId(clientId);
+			}
 			oos.writeUnshared(event);
 		} catch (Exception ex)
 		{
