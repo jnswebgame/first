@@ -53,7 +53,6 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 				}
 			}
 
-
 		} else if (event.getEventType() == GameEvent.EventType.GOLD_SPAWN)
 		{
 			for (int i = 0; i < golds.size(); i++)
@@ -168,7 +167,7 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 			{
 				//localPlayer.addGold(1);
 				gui.sendGoldTaken(golds.get(i));
-				golds.remove(i);
+				//golds.remove(i);
 
 			}
 

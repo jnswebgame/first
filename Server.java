@@ -37,7 +37,7 @@ import java.util.Random;
 
         public void start()
         {
-            timer = new Timer(30000, this);
+            timer = new Timer(10000, this);
             timer.start();
             keepRunning = true;
             try
@@ -303,6 +303,7 @@ import java.util.Random;
 				{
 					goldSpawn.setId(i+1);
 					gold_ids[i] = true;
+					break;
 				}
 			}
         	//goldSpawn.setId(++total_gold);
