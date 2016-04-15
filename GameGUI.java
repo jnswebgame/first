@@ -29,6 +29,7 @@ public class GameGUI
 
 		//JPanel panel = new JPanel();
 		panel = new MoveToMouse(this);
+		//panel.setSize(500, 500);
 
 
 		//panel.setBackground(Color.BLUE);
@@ -36,11 +37,14 @@ public class GameGUI
 		{
 			public void mouseClicked(MouseEvent e)
 			{
-				int x = e.getX();
-				int y = e.getY();
-				thisPlayer.setDestination(x, y);
-				//client.sendData(thisPlayer);
-				client.sendData(new GameEvent(x, y));
+				if (connected)
+				{
+					int x = e.getX();
+					int y = e.getY();
+					thisPlayer.setDestination(x, y);
+					//client.sendData(thisPlayer);
+					client.sendData(new GameEvent(x, y));
+				}
 			}
 		});
 
@@ -48,11 +52,12 @@ public class GameGUI
 		frame.add(panel);
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(500, 500);
+		//frame.setSize(520, 520);
+		frame.pack();
 		frame.setVisible(true);
 
 		//frame.pack();
-		client.start();
+		connected = client.start();
 		panel.setId(client.getId());
 		thisPlayer.setId(client.getId());
 	}

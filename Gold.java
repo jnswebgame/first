@@ -5,7 +5,7 @@ import java.awt.*;
 
 public class Gold implements Serializable
 {
-	private int x, y, id;
+	private int x, y, id, tile;
 	//Random = random;
 
 	public String toString()
@@ -18,6 +18,7 @@ public class Gold implements Serializable
 	{
 		this.x = x;
 		this.y = y;
+		tile = 0;
 	}
 
 	public void paintUnit(Graphics g)
@@ -32,6 +33,8 @@ public class Gold implements Serializable
 	public void setY(int y) { this.y = y; }
 	public void setId(int id) { this.id = id; }
 	public int getId() { return id; }
+	public int getTile() { return tile; }
+	public void setTile(int t) { this.tile = t; }
 	public Rectangle getBounds()
 	{
 		return new Rectangle(x-7, y-10, 14, 20);

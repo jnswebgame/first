@@ -6,6 +6,7 @@ import java.util.Collections;
 
 public class MoveToMouse extends JPanel implements ActionListener //, MouseListener
 {
+	private static final int PREF_HEIGHT = 500, PREF_WIDTH = 500;
 	private ArrayList<Player> players;
 	private ArrayList<Gold> golds;
 	private int localId = -1;
@@ -45,14 +46,12 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 		{
 			for (int i = 0; i < golds.size(); i++)
 			{
-				// I believe problem may be here
 				if (event.getGoldId() == golds.get(i).getId())
 				{
 					golds.remove(i);
 					break;
 				}
 			}
-
 		} else if (event.getEventType() == GameEvent.EventType.GOLD_SPAWN)
 		{
 			for (int i = 0; i < golds.size(); i++)
@@ -90,6 +89,7 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 			{
 				Player new_player = new Player(event.getX(), event.getY());
 				new_player.setId(event.getId());
+				new_player.setTile(0);
 				players.add(new_player);
 			}
 		}
@@ -143,16 +143,32 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 
 	public void paintComponent(Graphics g)
 	{
-		g.setColor(Color.white);
-		g.fillRect(0,0,500,500);
+		super.paintComponent(g);
+		//g.setColor(Color.white);
+		//g.fillRect(0,0,500,500);
+
+
+		// This is where we will call panels to draw themselves,
+		// based on where current player is.
+		setBackground(Color.WHITE);
+
+		int local_tile = localPlayer.getTile();
 
 		for (int i = 0; i < players.size(); i++)
 		{
-			players.get(i).paintUnit(g);
+			Player temp_player = players.get(i);
+			if (temp_player.getTile() == local_tile)
+			{
+				players.get(i).paintUnit(g);
+			}
 		}
 		for (int i = 0; i < golds.size(); i++)
 		{
-			golds.get(i).paintUnit(g);
+			Gold temp_gold = golds.get(i);
+			if (temp_gold.getTile() == local_tile)
+			{
+				golds.get(i).paintUnit(g);
+			}
 		}
 	}
 
@@ -165,12 +181,9 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 			Rectangle gold_rect = golds.get(i).getBounds();
 			if (current_player.intersects(gold_rect))
 			{
-				//localPlayer.addGold(1);
+				localPlayer.addGold(1);
 				gui.sendGoldTaken(golds.get(i));
-				//golds.remove(i);
-
 			}
-
 		}
 	}
 
@@ -180,16 +193,9 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 		repaint();
 	}
 
-	/*
-	public void mousePressed(MouseEvent e)
+	@Override
+	public Dimension getPreferredSize()
 	{
-		//int x = e.getX();
-		//int y = e.getY();
+		return new Dimension(PREF_WIDTH, PREF_HEIGHT);
 	}
-
-	public void mouseReleased(MouseEvent e){}
-	public void mouseClicked(MouseEvent e){}
-	public void mouseEntered(MouseEvent e){}
-	public void mouseExited(MouseEvent e){}
-	*/
 }

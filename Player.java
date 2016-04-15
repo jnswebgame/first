@@ -8,6 +8,7 @@ public class Player implements Serializable
 	private int goldCount;
 	private int x, y, id;
 	int xCurrent = 50, yCurrent = 50, xDestination = 50, yDestination = 50;
+	int tile = 0;
 	private int xDistance = 0, yDistance = 0, xVel = 0, yVel = 0;
 	private int velocity = 7;
 
@@ -24,7 +25,7 @@ public class Player implements Serializable
 
 	public void addGold(int i)
 	{
-		//goldCount += i;
+		goldCount += i;
 		//System.out.println("You now have " + goldCount + " gold");
 	}
 
@@ -41,6 +42,7 @@ public class Player implements Serializable
 		xVel = p.xVel;
 		yVel = p.yVel;
 		id = p.id;
+		tile = p.tile;
 		x = p.x;
 		y = p.y;
 	}
@@ -117,7 +119,9 @@ public class Player implements Serializable
 	public void setX(int x) { this.x = x; }
 	public void setY(int y) { this.y = y; }
 	public void setId(int id) { this.id = id; }
+	public void setTile(int t) { this.tile = t; }
 	public int getId() { return id; }
+	public int getTile() { return tile; }
 
 
 }
