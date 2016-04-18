@@ -113,11 +113,11 @@ public class Player implements Serializable
 	}
 	public int getX()
 	{
-		return x;
+		return xCurrent;
 	}
-	public int getY() { return y; }
-	public void setX(int x) { this.x = x; }
-	public void setY(int y) { this.y = y; }
+	public int getY() { return yCurrent; }
+	public void setX(int x) { this.xCurrent = x; }
+	public void setY(int y) { this.yCurrent = y; }
 	public void setId(int id) { this.id = id; }
 	public void setTile(int t) { this.tile = t; }
 	public int getId() { return id; }

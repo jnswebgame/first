@@ -43,7 +43,9 @@ public class GameGUI
 					int y = e.getY();
 					thisPlayer.setDestination(x, y);
 					//client.sendData(thisPlayer);
-					client.sendData(new GameEvent(x, y));
+					int tile = panel.getLocalTile();
+					GameEvent event = new GameEvent(x, y, GameEvent.EventType.PLAYER_MOVEMENT, tile);
+					client.sendData(event);
 				}
 			}
 		});
@@ -68,6 +70,13 @@ public class GameGUI
 		gold_taken.setId(clientId);
 		gold_taken.setGoldId(gold.getId());
 		client.sendData(gold_taken);
+	}
+	public void sendNewTile(Player player, int tile)
+	{
+		GameEvent move_tile = new GameEvent(player.getX(), player.getY(),
+										    GameEvent.EventType.PLAYER_MOVEMENT, tile);
+		move_tile.setId(clientId);
+		client.sendData(move_tile);
 	}
 
 	public void setId(int id)

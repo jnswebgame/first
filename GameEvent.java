@@ -32,6 +32,7 @@ public class GameEvent implements Serializable
 		move_to_x = x;
 		move_to_y = y;
 		event_type = EventType.PLAYER_MOVEMENT;
+		tile = 0;
 	}
 
 	public GameEvent(int x, int y, EventType event)
@@ -39,6 +40,15 @@ public class GameEvent implements Serializable
 		move_to_x = x;
 		move_to_y = y;
 		event_type = event;
+		tile = 0;
+	}
+
+	public GameEvent(int x, int y, EventType event, int tile)
+	{
+		move_to_x = x;
+		move_to_y = y;
+		event_type = event;
+		this.tile = tile;
 	}
 
 

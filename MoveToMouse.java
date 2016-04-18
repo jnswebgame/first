@@ -7,11 +7,14 @@ import java.util.Collections;
 public class MoveToMouse extends JPanel implements ActionListener //, MouseListener
 {
 	private static final int PREF_HEIGHT = 500, PREF_WIDTH = 500;
+	private static final int MARGIN = 20;
+	private static final int EDGE_X = PREF_WIDTH - MARGIN, EDGE_Y = PREF_HEIGHT - MARGIN;
 	private ArrayList<Player> players;
 	private ArrayList<Gold> golds;
 	private int localId = -1;
 	Player localPlayer;
 	GameGUI gui;
+	DrawPanel draw_panel;
 
 	public int velocity = 7;
 
@@ -21,6 +24,10 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 	{
 		localId = id;
 	}
+	public int getLocalTile()
+	{
+		return localPlayer.getTile();
+	}
 
 	public MoveToMouse(GameGUI gui)
 	{
@@ -28,6 +35,7 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 		localPlayer = new Player();
 		players = new ArrayList<Player>();
 		golds = new ArrayList<Gold>();
+		draw_panel = new DrawPanel(this);
 		//addMouseListener(this);
 		timer = new Timer(25, this);
 		timer.start();
@@ -82,6 +90,15 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 					}
 					players.get(i).xDestination = event.getX();
 					players.get(i).yDestination = event.getY();
+					int old_tile = players.get(i).getTile();
+					int new_tile = event.getTile();
+					if (old_tile != new_tile)
+					{
+						players.get(i).setX(event.getX());
+						players.get(i).setY(event.getY());
+						players.get(i).setTile(event.getTile());
+					}
+
 					found = true;
 				}
 			}
@@ -90,6 +107,10 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 				Player new_player = new Player(event.getX(), event.getY());
 				new_player.setId(event.getId());
 				new_player.setTile(0);
+				if (event.getId() == localId)
+				{
+					localPlayer = new_player;
+				}
 				players.add(new_player);
 			}
 		}
@@ -144,22 +165,24 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 	public void paintComponent(Graphics g)
 	{
 		super.paintComponent(g);
+		int local_tile = localPlayer.getTile();
+
 		//g.setColor(Color.white);
 		//g.fillRect(0,0,500,500);
 
 
 		// This is where we will call panels to draw themselves,
 		// based on where current player is.
-		setBackground(Color.WHITE);
+		//setBackground(Color.WHITE);
+		draw_panel.drawPanel(local_tile, g);
 
-		int local_tile = localPlayer.getTile();
 
 		for (int i = 0; i < players.size(); i++)
 		{
 			Player temp_player = players.get(i);
 			if (temp_player.getTile() == local_tile)
 			{
-				players.get(i).paintUnit(g);
+				temp_player.paintUnit(g);
 			}
 		}
 		for (int i = 0; i < golds.size(); i++)
@@ -167,7 +190,7 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 			Gold temp_gold = golds.get(i);
 			if (temp_gold.getTile() == local_tile)
 			{
-				golds.get(i).paintUnit(g);
+				temp_gold.paintUnit(g);
 			}
 		}
 	}
@@ -187,9 +210,70 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 		}
 	}
 
+	public void checkEdges()
+	{
+		int local_x = localPlayer.getX();
+		int local_y = localPlayer.getY();
+		int local_tile = localPlayer.getTile();
+		Player temp_player = localPlayer;
+
+		if (local_x > EDGE_X)
+		{
+			if (local_tile == 0)
+			{
+				temp_player.setX(22);
+				gui.sendNewTile(temp_player, 1);
+			} else if (local_tile == 2)
+			{
+				temp_player.setX(22);
+				gui.sendNewTile(temp_player, 3);
+			}
+
+		}
+		if (local_x < MARGIN)
+		{
+			if (local_tile == 1)
+			{
+				temp_player.setX(478);
+				gui.sendNewTile(temp_player, 0);
+			} else if (local_tile == 3)
+			{
+				temp_player.setX(478);
+				gui.sendNewTile(temp_player, 2);
+			}
+		}
+		if (local_y > EDGE_Y)
+		{
+			if (local_tile == 0)
+			{
+				temp_player.setY(22);
+				gui.sendNewTile(temp_player, 2);
+			} else if (local_tile == 1)
+			{
+				temp_player.setY(22);
+				gui.sendNewTile(temp_player, 3);
+			}
+		}
+		if (local_y < MARGIN)
+		{
+			if (local_tile == 2)
+			{
+				temp_player.setY(478);
+				gui.sendNewTile(temp_player, 0);
+			} else if (local_tile == 3)
+			{
+				temp_player.setY(478);
+				gui.sendNewTile(temp_player, 1);
+			}
+		}
+
+
+	}
+
 	public void actionPerformed(ActionEvent e)
 	{
 		checkGold();
+		checkEdges();
 		repaint();
 	}
 
