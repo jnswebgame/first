@@ -38,9 +38,9 @@ public class DrawPanel
 				break;
 			case 3: drawPanelFour(g);
 				break;
-			case 3: drawPanelFive(g);
+			case 4: drawPanelFive(g);
 				break;
-			case 3: drawPanelSix(g);
+			case 5: drawPanelSix(g);
 				break;								
 		}
 
@@ -78,22 +78,22 @@ public class DrawPanel
 
 	private void drawPanelThree(Graphics g)
 	{
-		g.drawImage(background1, 0, 0, 500, 500); //MoveToMouse.PREF_HEIGHT/WIDTH?
+		g.drawImage(background1, 0, 0, MoveToMouse.PREF_WIDTH, MoveToMouse.PREF_HEIGHT);
 	}
 
 	private void drawPanelFour(Graphics g)
 	{
-		g.drawImage(background2, 0, 0, 500, 500);
+		g.drawImage(background2, 0, 0, MoveToMouse.PREF_WIDTH, MoveToMouse.PREF_HEIGHT);
 	}
 
 	private void drawPanelFive(Graphics g)
 	{
-		g.drawImage(background3, 0, 0, 500, 500); 
+		g.drawImage(background3, 0, 0, MoveToMouse.PREF_WIDTH, MoveToMouse.PREF_HEIGHT); 
 	}
 
 	private void drawPanelSix(Graphics g)
 	{
-		g.drawImage(background4, 0, 0, 500, 500);
+		g.drawImage(background4, 0, 0, MoveToMouse.PREF_WIDTH, MoveToMouse.PREF_HEIGHT);
 	}	
 
 
