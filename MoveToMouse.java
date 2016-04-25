@@ -6,7 +6,7 @@ import java.util.Collections;
 
 public class MoveToMouse extends JPanel implements ActionListener //, MouseListener
 {
-	private static final int PREF_HEIGHT = 500, PREF_WIDTH = 500;
+	public static final int PREF_HEIGHT = 500, PREF_WIDTH = 500;
 	private static final int MARGIN = 20;
 	private static final int EDGE_X = PREF_WIDTH - MARGIN, EDGE_Y = PREF_HEIGHT - MARGIN;
 	private ArrayList<Player> players;
