@@ -1,15 +1,37 @@
 
 import java.awt.*;
 import javax.swing.*;
+import java.awt.image.*;
+import java.io.*;
+
 
 public class DrawPanel
 {
 	MoveToMouse panel;
 	JButton button;
 
+	private ImageIcon b1;
+	private ImageIcon b2;
+	private ImageIcon b3;
+	private ImageIcon b4;
+
+	private Image background1;
+	private Image background2;
+	private Image background3;
+	private Image background4;	
+
 	public DrawPanel(MoveToMouse panel)
 	{
 		this.panel = panel;
+		b1 = new ImageIcon("level1.jpg");
+		b2 = new ImageIcon("level2.jpg");
+		b3 = new ImageIcon("level3.jpg");
+		b4 = new ImageIcon("level4.jpg");
+
+		background1 = b1.getImage().getScaledInstance(MoveToMouse.PREF_WIDTH, MoveToMouse.PREF_HEIGHT, Image.SCALE_DEFAULT);
+		background2 = b2.getImage().getScaledInstance(MoveToMouse.PREF_WIDTH, MoveToMouse.PREF_HEIGHT, Image.SCALE_DEFAULT);
+		background3 = b3.getImage().getScaledInstance(MoveToMouse.PREF_WIDTH, MoveToMouse.PREF_HEIGHT, Image.SCALE_DEFAULT);
+		background4 = b4.getImage().getScaledInstance(MoveToMouse.PREF_WIDTH, MoveToMouse.PREF_HEIGHT, Image.SCALE_DEFAULT);
 	}
 
 	public void drawPanel(int panel, Graphics g)
@@ -24,6 +46,10 @@ public class DrawPanel
 				break;
 			case 3: drawPanelFour(g);
 				break;
+			case 4: drawPanelFive(g);
+				break;
+			case 5: drawPanelSix(g);
+				break;								
 		}
 
 	}
@@ -60,15 +86,23 @@ public class DrawPanel
 
 	private void drawPanelThree(Graphics g)
 	{
-		panel.setBackground(Color.BLUE);
+		g.drawImage(background1, 0, 0, panel);
 	}
 
 	private void drawPanelFour(Graphics g)
 	{
-		panel.setBackground(Color.GREEN);
+		g.drawImage(background2, 0, 0, panel);
 	}
 
+	private void drawPanelFive(Graphics g)
+	{
+		g.drawImage(background3, 0, 0, panel); 
+	}
 
+	private void drawPanelSix(Graphics g)
+	{
+		g.drawImage(background4, 0, 0, panel);
+	}	
 
 
 }
