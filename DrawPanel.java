@@ -1,15 +1,29 @@
 
 import java.awt.*;
 import javax.swing.*;
+import javax.imageio;
 
 public class DrawPanel
 {
 	MoveToMouse panel;
 	JButton button;
+	BufferedImage background1;
+	BufferedImage background2;
+	BufferedImage background3;
+	BufferedImage background4;
+
 
 	public DrawPanel(MoveToMouse panel)
 	{
 		this.panel = panel;
+		try
+		{
+			background1 = ImageIO.read(new File("level1.jpg"));
+			background2 = ImageIO.read(new File("level2.jpg"));
+			background3 = ImageIO.read(new File("level3.jpg"));
+			background4 = ImageIO.read(new File("level4.jpg"));
+		}
+		catch(IOException e){}
 	}
 
 	public void drawPanel(int panel, Graphics g)
@@ -24,6 +38,10 @@ public class DrawPanel
 				break;
 			case 3: drawPanelFour(g);
 				break;
+			case 3: drawPanelFive(g);
+				break;
+			case 3: drawPanelSix(g);
+				break;								
 		}
 
 	}
@@ -60,15 +78,23 @@ public class DrawPanel
 
 	private void drawPanelThree(Graphics g)
 	{
-		panel.setBackground(Color.BLUE);
+		g.drawImage(background1, 0, 0, 500, 500); //MoveToMouse.PREF_HEIGHT/WIDTH?
 	}
 
 	private void drawPanelFour(Graphics g)
 	{
-		panel.setBackground(Color.GREEN);
+		g.drawImage(background2, 0, 0, 500, 500);
 	}
 
+	private void drawPanelFive(Graphics g)
+	{
+		g.drawImage(background3, 0, 0, 500, 500); 
+	}
 
+	private void drawPanelSix(Graphics g)
+	{
+		g.drawImage(background4, 0, 0, 500, 500);
+	}	
 
 
 }
