@@ -1,14 +1,13 @@
-
-
 import java.io.*;
 import java.awt.*;
 
 public class Player implements Serializable
 {
 	private int goldCount;
-	private int x, y, id;
+	private int x, y, id, atk, def, agi;
 	int xCurrent = 50, yCurrent = 50, xDestination = 50, yDestination = 50;
 	int tile = 0;
+	int hp =0;
 	private int xDistance = 0, yDistance = 0, xVel = 0, yVel = 0;
 	private int velocity = 7;
 
@@ -45,6 +44,10 @@ public class Player implements Serializable
 		tile = p.tile;
 		x = p.x;
 		y = p.y;
+		hp = p.hp;
+		atk = p.atk;
+		def = p.def;
+		agi= p.agi;
 	}
 
 	public void setPosition(int x, int y)
@@ -115,13 +118,25 @@ public class Player implements Serializable
 	{
 		return xCurrent;
 	}
-	public int getY() { return yCurrent; }
-	public void setX(int x) { this.xCurrent = x; }
-	public void setY(int y) { this.yCurrent = y; }
-	public void setId(int id) { this.id = id; }
-	public void setTile(int t) { this.tile = t; }
+	public int getHP(){ return hp;}	
+	public int getAtk(){return atk;}
+	public int getDef(){return def;}
+	public int getAgi() {return agi;}
+	public int getY() { return y; }
+	public int getGold() { return goldCount;}
 	public int getId() { return id; }
 	public int getTile() { return tile; }
+
+	
+	public void setHP(int i){this.hp=i;}	
+	public void setX(int x) { this.x = x; }
+	public void setY(int y) { this.y = y; }
+	public void setId(int id) { this.id = id; }
+	public void setGold(int g){this.goldCount= g;}		
+	public void setATK(int i){this.atk=i;}	
+	public void setDEF(int i) { this.def = i; }
+	public void setAGI(int i) { this.agi=i;}
+	public void setTile(int t) { this.tile = t; }
 
 
 }
