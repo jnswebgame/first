@@ -6,6 +6,9 @@ public class Combat
 	private boolean end;
 	private Player turnPlayer;
 	private Player opponent;
+	private CombatPanel cp;
+	
+	
 	public Combat(Player turn, Player op)
 	{		
 		newBattle(turn, op);
@@ -31,12 +34,12 @@ public class Combat
 	public void newTurn(Player turn, Player op)
 	{		
 		turnPlayer=turn;
+		cp.updateHP(turnPlayer.getHP());
 		opponent = op;
 	}
 	 
-	private void action()
+	protected void action(String choice)
 	{
-		String choice="";
 		if(choice.equals("attack"))
 		{			
 			damage(turnPlayer, opponent);
@@ -44,7 +47,7 @@ public class Combat
 		if(choice.equals("cash"))
 		{
 			//subtracts gold, 
-			//ends the battl
+			//ends the battle
 			cash();
 		}
 	}
@@ -71,18 +74,23 @@ public class Combat
 			int damage = (random.nextInt(4)+1+(p1atk * 2)) * criticalHit() -p2def;
 			
 			if(damage>0)
+			{
 				p2.setHP(p2HP-damage);
-			if(damage<=0)
-				//return "missed", "No damage" or something.
+				cp.updateMessage(damage + " damage!");
+			}
+			
 			
 			if(p2.getHP() <=0)
 			{
-				end=true;
 				death(opponent);
+				cp.updateMessage("You win!");
+				end=true;
+				
 			}
 		}
 		if(dodge())
-		{
+		{			
+			cp.updateMessage("Missed!");							
 			newTurn(opponent, turnPlayer);
 		}
 	}
@@ -105,19 +113,27 @@ public class Combat
 		int thrownRequired = opponent.getDef();
 		if(thrownRequired>gold)
 		{
-			//you can't do that
+			cp.updateMessage("You don't have enough gold!");
 		}
 		else
 		{
+			cp.updateGold(gold-thrownRequired);
 			turnPlayer.setGold(gold-thrownRequired);
 			end = true;
 		}
 		
+	}
+	protected boolean getEnd()
+	{return end;}
+	protected void addCombatPanel(CombatPanel c)
+	{
+		cp=c;
 	}
 	private void death(Player deadPlayer)
 	{
 		deadPlayer.setPosition(10, 10);
 		end=true;
 	}
+	
 	
 }
