@@ -182,7 +182,7 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 			Player temp_player = players.get(i);
 			if (temp_player.getTile() == local_tile)
 			{
-				temp_player.paintUnit(g);
+				temp_player.paintUnit(g, this);
 			}
 		}
 		for (int i = 0; i < golds.size(); i++)

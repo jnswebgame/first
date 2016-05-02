@@ -1,5 +1,7 @@
 import java.io.*;
 import java.awt.*;
+import javax.swing.*;
+import java.awt.image.*;
 
 public class Player implements Serializable
 {
@@ -10,6 +12,18 @@ public class Player implements Serializable
 	int hp =0;
 	private int xDistance = 0, yDistance = 0, xVel = 0, yVel = 0;
 	private int velocity = 7;
+
+	MoveToMouse panel;
+
+	private ImageIcon u = new ImageIcon("linkFront.png"); //there are no fucking pictures of link from the back on the whole internet
+	private ImageIcon d = new ImageIcon("linkFront.png");
+	private ImageIcon r = new ImageIcon("linkRight.png");
+	private ImageIcon l = new ImageIcon("linkLeft.png");
+
+	private Image up = u.getImage().getScaledInstance(20, 20, Image.SCALE_DEFAULT);
+	private Image down = d.getImage().getScaledInstance(20, 20, Image.SCALE_DEFAULT);
+	private Image right = r.getImage().getScaledInstance(20, 20, Image.SCALE_DEFAULT);
+	private Image left = l.getImage().getScaledInstance(20, 20, Image.SCALE_DEFAULT);	
 
 
 	public String toString()
@@ -68,11 +82,32 @@ public class Player implements Serializable
 		yDestination = y;
 	}
 
-	public void paintUnit(Graphics g)
+	public void paintUnit(Graphics g, MoveToMouse panel)
 	{
 		updatePosition();
-		g.setColor(Color.BLACK);
-		g.fillOval(xCurrent-10, yCurrent-10, 20, 20);
+
+		if(Math.abs(xVel) > Math.abs(yVel))
+		{
+			if(xVel > 0)
+			{
+				g.drawImage(up, xCurrent-10, yCurrent-10, panel);
+			}
+			else
+			{
+				g.drawImage(down, xCurrent-10, yCurrent-10, panel);
+			}
+		}
+		if(Math.abs(xVel) <= Math.abs(yVel))
+		{	
+			if(yVel > 0)
+			{
+				g.drawImage(right, xCurrent-10, yCurrent-10, panel);
+			}
+			else
+			{
+				g.drawImage(left, xCurrent-10, yCurrent-10, panel);
+			}
+		}
 	}
 
 	protected void updatePosition()
