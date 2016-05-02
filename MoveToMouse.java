@@ -15,6 +15,8 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 	Player localPlayer;
 	GameGUI gui;
 	DrawPanel draw_panel;
+	int local_tile;
+	Combat combat;
 
 	public int velocity = 7;
 
@@ -28,13 +30,17 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 	{
 		return localPlayer.getTile();
 	}
+	public Player getLocalPlayer()
+	{
+		return localPlayer;
+	}
 
 	public MoveToMouse(GameGUI gui)
 	{
 		this.gui = gui;
 		localPlayer = new Player();
-		players = new ArrayList<Player>();
-		golds = new ArrayList<Gold>();
+		//players = new ArrayList<Player>();
+		//golds = new ArrayList<Gold>();
 		draw_panel = new DrawPanel(this);
 		//addMouseListener(this);
 		timer = new Timer(25, this);
@@ -44,6 +50,27 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 	public void updateLocal(Player play)
 	{
 		localPlayer = play;
+	}
+
+	public void update(GameState gameState)
+	{
+		players = gameState.getPlayers();
+		golds = gameState.getGolds();
+		System.out.println("Golds size: " + golds.size());
+		//repaint();
+		setId(gameState.getClientId());
+		for (int i = 0; i < players.size(); i++)
+		{
+			if (gameState.getClientId() == players.get(i).getId())
+			{
+				updateLocal(players.get(i));
+				local_tile = players.get(i).getTile();
+			}
+			if (gameState.getPlayers().get(i).online)
+			{
+				players.get(i).online = true;
+			}
+		}
 	}
 
 	public void update(GameEvent event)
@@ -58,6 +85,57 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 				{
 					golds.remove(i);
 					break;
+				}
+			}
+		} else if (event.getEventType() == GameEvent.EventType.INITIATE_COMBAT)
+		{
+			int player_one_id = event.getId();
+			int player_two_id = event.enemy_id;
+			Player p1 = new Player(), p2 = new Player();
+			for( int i = 0; i < players.size(); i++)
+			{
+				if (players.get(i).getId() == player_one_id)
+				{
+					players.get(i).setTile(event.getTile());
+					p1 = players.get(i);
+				}
+				if (players.get(i).getId() == player_two_id)
+				{
+					players.get(i).setTile(event.getTile());
+					p2 = players.get(i);
+				}
+			}
+			//combat = new Combat(p1, p2);
+		} else if (event.getEventType() == GameEvent.EventType.BATTLE)
+		{
+			if (localPlayer.getTile() < 4)
+			{
+				return;
+			}
+
+			Player enemy_player;
+
+			for (int i = 0; i < players.size(); i++)
+			{
+				if (players.get(i).getId() == event.enemy_id)
+				{
+					 enemy_player = players.get(i);
+					 if (event.command.equals("attack"))
+					 {
+					 	draw_panel.updateBattle(event, localPlayer, enemy_player);
+					 }
+				}
+
+
+			}
+
+		} else if (event.getEventType() == GameEvent.EventType.OFFLINE)
+		{
+			for (int i = 0; i < players.size(); i++)
+			{
+				if (event.getId() == players.get(i).getId())
+				{
+					players.get(i).online = false;
 				}
 			}
 		} else if (event.getEventType() == GameEvent.EventType.GOLD_SPAWN)
@@ -88,6 +166,7 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 					{
 						localPlayer = players.get(i);
 					}
+					players.get(i).online = true;
 					players.get(i).xDestination = event.getX();
 					players.get(i).yDestination = event.getY();
 					int old_tile = players.get(i).getTile();
@@ -165,7 +244,7 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 	public void paintComponent(Graphics g)
 	{
 		super.paintComponent(g);
-		int local_tile = localPlayer.getTile();
+		local_tile = localPlayer.getTile();
 
 		//g.setColor(Color.white);
 		//g.fillRect(0,0,500,500);
@@ -175,12 +254,23 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 		// based on where current player is.
 		//setBackground(Color.WHITE);
 		draw_panel.drawPanel(local_tile, g);
+		g.setColor(Color.YELLOW);
+		g.drawString("Gold: " + localPlayer.getGold(), 230, 480);
 
+		g.drawString("HP: " + localPlayer.getHP(), 400, 380);
+		g.drawString("ATK: " + localPlayer.getAtk(), 400, 395);
+		g.drawString("DEF: " + localPlayer.getDef(), 400, 410);
+		g.drawString("AGI: " + localPlayer.getAgi(), 400, 425);
+		g.drawString("Name: " + localPlayer.getName(), 50, 450);
+		if (local_tile > 3)
+		{
+			return;
+		}
 
 		for (int i = 0; i < players.size(); i++)
 		{
 			Player temp_player = players.get(i);
-			if (temp_player.getTile() == local_tile)
+			if (temp_player.getTile() == local_tile && players.get(i).online)
 			{
 				temp_player.paintUnit(g, this);
 			}
@@ -208,6 +298,12 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 				gui.sendGoldTaken(golds.get(i));
 			}
 		}
+	}
+
+	public void sendBattleCommand(String command)
+	{
+		gui.sendBattleCommand(command);
+
 	}
 
 	public void checkEdges()
@@ -270,10 +366,39 @@ public class MoveToMouse extends JPanel implements ActionListener //, MouseListe
 
 	}
 
+	public void checkCombat()
+	{
+		Rectangle current_player = localPlayer.getBounds();
+		if (localPlayer.getTile() == 0)
+		{
+			return;
+		}
+		for (int i = 0; i < players.size(); i++)
+		{
+			if (players.get(i).getId() == localId || !players.get(i).online || players.get(i).tile == 0)
+			{
+				continue;
+			}
+
+
+			Rectangle enemy_player = players.get(i).getBounds();
+			if (current_player.intersects(enemy_player))
+			{
+				GameEvent initiate_combat = new GameEvent(GameEvent.EventType.INITIATE_COMBAT);
+				initiate_combat.setId(localId);
+				initiate_combat.enemy_id = players.get(i).getId();
+				gui.sendCombat(initiate_combat);
+			}
+
+
+		}
+	}
+
 	public void actionPerformed(ActionEvent e)
 	{
 		checkGold();
 		checkEdges();
+		checkCombat();
 		repaint();
 	}
 

@@ -1,24 +1,25 @@
 import java.util.Random;
 
-public class Combat 
+public class Combat
 {
 	private Random random;
 	private boolean end;
 	private Player turnPlayer;
 	private Player opponent;
 	private CombatPanel cp;
-	
-	
-	public Combat(Player turn, Player op)
-	{		
+
+
+	public Combat(Player turn, Player op, CombatPanel cp)
+	{
+		this.cp = cp;
 		newBattle(turn, op);
 	}
-	
+
 	public Combat(){}
-	
+
 	public void newBattle(Player p1, Player p2)
 	{
-		if(p1.getAgi()>p2.getAgi())	
+		if(p1.getAgi()>p2.getAgi())
 			newTurn(p1, p2);
 		if(p2.getAgi()>p1.getAgi())
 			newTurn(p2, p1);
@@ -32,65 +33,65 @@ public class Combat
 	}
 
 	public void newTurn(Player turn, Player op)
-	{		
+	{
 		turnPlayer=turn;
 		cp.updateHP(turnPlayer.getHP());
 		opponent = op;
 	}
-	 
+
 	protected void action(String choice)
 	{
 		if(choice.equals("attack"))
-		{			
+		{
 			damage(turnPlayer, opponent);
-		}		
+		}
 		if(choice.equals("cash"))
 		{
-			//subtracts gold, 
+			//subtracts gold,
 			//ends the battle
 			cash();
 		}
 	}
-	
+
 	private boolean dodge()
 	{
 		boolean missed = false;
 		int evasion = opponent.getAgi() - turnPlayer.getAgi();
 		if(evasion>0)
-		{			
+		{
 			if(evasion >= random.nextInt(10))
 				missed=true;
 		}
 		return missed;
 	}
-	
+
 	private void damage(Player p1, Player p2)
 	{
 		if(!dodge())
 		{
 			int p1atk = p1.getAtk();
 			int p2def = p2.getDef();
-			int p2HP = p2.getHP();		
+			int p2HP = p2.getHP();
 			int damage = (random.nextInt(4)+1+(p1atk * 2)) * criticalHit() -p2def;
-			
+
 			if(damage>0)
 			{
 				p2.setHP(p2HP-damage);
 				cp.updateMessage(damage + " damage!");
 			}
-			
-			
+
+
 			if(p2.getHP() <=0)
 			{
 				death(opponent);
 				cp.updateMessage("You win!");
 				end=true;
-				
+
 			}
 		}
 		if(dodge())
-		{			
-			cp.updateMessage("Missed!");							
+		{
+			cp.updateMessage("Missed!");
 			newTurn(opponent, turnPlayer);
 		}
 	}
@@ -99,7 +100,7 @@ public class Combat
 		int ret = 1;
 		int chance =  turnPlayer.getAgi() - opponent.getAgi();
 		if(chance>0)
-		{			
+		{
 			if(chance >= random.nextInt(10))
 				ret = 2;
 		}
@@ -121,7 +122,7 @@ public class Combat
 			turnPlayer.setGold(gold-thrownRequired);
 			end = true;
 		}
-		
+
 	}
 	protected boolean getEnd()
 	{return end;}
@@ -134,6 +135,6 @@ public class Combat
 		deadPlayer.setPosition(10, 10);
 		end=true;
 	}
-	
-	
+
+
 }

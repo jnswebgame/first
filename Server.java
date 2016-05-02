@@ -17,7 +17,10 @@ import java.util.Random;
         private static int clientId, total_gold;
         private ArrayList<ClientThread> al;
         private ArrayList<Player> pl;
+        private ArrayList<Gold> golds;
+        private int battle_scene = 4;
         boolean [] gold_ids = { false, false, false, false, false};
+        int MAX_GOLD = 5;
         //private ServerGUI serverGui;
 
         private int port;
@@ -25,15 +28,96 @@ import java.util.Random;
 
         Random random = new Random();
         private Timer timer;
+        private GameState gameState;
 
         public Server(int port)
         {
             this.port = port;
             al = new ArrayList<ClientThread>();
-            pl = new ArrayList<Player>();
-            clientId = 0;
+            //pl = new ArrayList<Player>();
             total_gold = 0;
+            try
+            {
+            	loadGameState();
+			} catch (Exception e)
+			{
+				gameState = new GameState();
+			}
+            clientId = gameState.getId();
+            if (clientId > 0)
+            {
+				pl = gameState.getPlayers();
+				//System.out.println("Size of pl: " + pl.size());
+				if (pl.size() == 0)
+				{
+					pl = new ArrayList<Player>();
+				}
+				for (int i = 0; i < pl.size(); i++)
+				{
+					pl.get(i).online = false;
+					pl.get(i).setATK(6);
+					pl.get(i).setDEF(6);
+					pl.get(i).setAGI(6);
+					pl.get(i).setHP(20);
+					if (pl.get(i).getTile() > 3)
+					{
+						pl.get(i).setTile(0);
+
+					}
+				}
+				/*
+				golds = gameState.getGolds();
+				if (golds.size() == 0)
+				{
+					golds = new ArrayList<Gold>();
+				} else
+				{
+					total_gold = gameState.getTotalGold();
+					for (int i = 0; i < MAX_GOLD; i++)
+					{
+						gold_ids[i] = gameState.goldIds[i];
+					}
+				}*/
+				//pl = new ArrayList<Player>();
+				//golds = new ArrayList<Gold>();
+				//golds = gameState.getGolds();
+			} else
+			{
+				pl = new ArrayList<Player>();
+				golds = new ArrayList<Gold>();
+			}
+			golds = new ArrayList<Gold>();
         }
+
+        public void loadGameState() throws Exception
+        {
+			GameState gs;
+			try
+			{
+				FileInputStream fin = new FileInputStream("State.dat");
+				ObjectInputStream ois = new ObjectInputStream(fin);
+				gs = (GameState)ois.readObject();
+            	ois.close();
+			} catch( Exception e)
+			{
+				//gameState = new GameState();
+				throw e;
+			}
+			gameState = gs;
+		}
+
+ 	   public static void saveGameState(GameState gs) throws FileNotFoundException
+ 	   {
+ 	       try
+ 	       {
+ 	           FileOutputStream fout = new FileOutputStream("State.dat");
+ 	           ObjectOutputStream oos = new ObjectOutputStream(fout);
+ 	           oos.writeUnshared(gs);
+ 	           fout.close();
+       	   }catch(Exception e){
+               e.printStackTrace();
+           }
+    	}
 
         public void start()
         {
@@ -158,6 +242,38 @@ import java.util.Random;
 		}
 	}
 
+	public int checkPlayers(String name)
+	{
+		boolean found = false;
+		int id = 0;
+		for (int i = 0; i < pl.size(); i++)
+		{
+			if (pl.get(i).getName().equals(name))
+			{
+				System.out.println("Name = " + name);
+				id = pl.get(i).getId();
+				pl.get(i).online = true;
+				found = true;
+			}
+
+		}
+		if (!found)
+		{
+			id = gameState.getId();
+			if (id == 0)
+			{
+				id = 1;
+			}
+			Player player = new Player(name, id);
+			player.online = true;
+			pl.add(player);
+			gameState.setId(id + 1);
+			gameState.addToPlayers(player);
+			//gameState.setPlayers(pl);
+		}
+		return id;
+	}
+
     class ClientThread extends Thread
     {
         Socket sock;
@@ -170,16 +286,25 @@ import java.util.Random;
 
         ClientThread(Socket sock)
         {
-            clientId++;
-            id = clientId;
+            //clientId++;
+            //id = clientId;
             this.sock = sock;
             try
             {
                 oos = new ObjectOutputStream(sock.getOutputStream());
                 ois = new ObjectInputStream(sock.getInputStream());
                 userName = (String) ois.readObject();
+
+                id = checkPlayers(userName);
+                gameState.setClientId(id);
+                System.out.println("Id = " + id);
+
                 display(userName + " has connected");
-                oos.writeObject(id);
+
+                // Game state here
+                oos.writeUnshared(gameState);
+                saveGameState(gameState);
+
                 GameEvent event = new GameEvent(50, 50);
                 event.setId(id);
                 sendData(event);
@@ -190,10 +315,40 @@ import java.util.Random;
             }
         }
 
+        public void updatePlayer(GameEvent event)
+        {
+			for (int i = 0; i < pl.size(); i++)
+			{
+				if (pl.get(i).getId() == event.getId())
+				{
+					pl.get(i).setX(event.getX());
+					pl.get(i).setY(event.getY());
+					pl.get(i).xDestination = event.getX();
+					pl.get(i).yDestination = event.getY();
+					pl.get(i).setTile(event.getTile());
+				}
+			}
+			try
+			{
+				saveGameState(gameState);
+			} catch (Exception e)
+			{
+				System.out.println("Error saving game state on movement update");
+			}
+
+		}
+
+		public int getNextBattleScene()
+		{
+			return battle_scene;
+		}
+
+
         public void run()
         {
             boolean updated = false;
             Player player2;
+            int thisId = 0;
             while(true)
             {
 				try
@@ -214,12 +369,31 @@ import java.util.Random;
 						if (event.getEventType() == GameEvent.EventType.GOLD_TAKEN)
 						{
 							removeGold(event);
+						} else if (event.getEventType() == GameEvent.EventType.PLAYER_MOVEMENT)
+						{
+							thisId = event.getId();
+							updatePlayer(event);
+						} else if (event.getEventType() == GameEvent.EventType.INITIATE_COMBAT)
+						{
+							int new_tile = getNextBattleScene();
+							event.setTile(new_tile);
 						}
 						sendData(event);
 					}
 				} catch (Exception e)
 				{
-					display("A player has Disconnected!");
+					//display("A player has Disconnected!");
+					for (int i = 0; i < pl.size(); i++)
+					{
+						if (pl.get(i).getId() == thisId)
+						{
+							pl.get(i).online = false;
+							display(pl.get(i).getName() + " has gone offline");
+							GameEvent offline_event = new GameEvent(GameEvent.EventType.OFFLINE);
+							offline_event.setId( pl.get(i).getId());
+							sendData(offline_event);
+						}
+					}
 					break;
 				}
 
@@ -255,6 +429,7 @@ import java.util.Random;
 			} catch (Exception ex)
 			{
 				display("Error sending event");
+				//return false;
 			}
 			return true;
 
@@ -284,9 +459,31 @@ import java.util.Random;
     public void removeGold(GameEvent e)
     {
 		int remove_id = e.getGoldId();
+		int player_id = e.getId();
+		for (int i = 0; i < pl.size(); i++)
+		{
+			if (pl.get(i).getId() == player_id)
+			{
+				pl.get(i).setGold(pl.get(i).getGold()+1);
+			}
+		}
 		total_gold--;
 		gold_ids[remove_id-1] = false;
-
+		for (int i = 0; i < golds.size(); i++)
+		{
+			if (e.getGoldId() == golds.get(i).getId())
+			{
+				gameState.removeFromGolds(golds.get(i));
+				golds.remove(i);
+				break;
+			}
+		}
+		try
+		{
+			saveGameState(gameState);
+		} catch (Exception ex)
+		{
+		}
 	}
 
     public void actionPerformed(ActionEvent e)
@@ -295,14 +492,21 @@ import java.util.Random;
 		{
         	int x = random.nextInt(501);
         	int y = random.nextInt(501);
-        	GameEvent goldSpawn = new GameEvent(x, y, GameEvent.EventType.GOLD_SPAWN);
+        	int p = random.nextInt(3);
+        	p += 2;
+        	GameEvent goldSpawn = new GameEvent(x, y, GameEvent.EventType.GOLD_SPAWN, p);
         	total_gold++;
-        	for (int i = 0; i < gold_ids.length; i++)
+        	for (int i = 0; i < MAX_GOLD; i++)
         	{
 				if (!gold_ids[i])
 				{
 					goldSpawn.setId(i+1);
 					gold_ids[i] = true;
+					Gold new_gold = new Gold(x, y);
+					new_gold.setTile(p);
+					new_gold.setId(i+1);
+					golds.add(new_gold);
+					gameState.addToGolds(new_gold);
 					break;
 				}
 			}

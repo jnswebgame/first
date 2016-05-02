@@ -2,13 +2,17 @@
 import java.awt.*;
 import javax.swing.*;
 import java.awt.image.*;
+import java.awt.event.*;
 import java.io.*;
 
 
-public class DrawPanel
+public class DrawPanel implements ActionListener
 {
 	MoveToMouse panel;
 	JButton button;
+	JButton attack;
+	JButton coin;
+	JLabel label;
 
 	private ImageIcon b1;
 	private ImageIcon b2;
@@ -18,11 +22,13 @@ public class DrawPanel
 	private Image background1;
 	private Image background2;
 	private Image background3;
-	private Image background4;	
+	private Image background4;
 
 	public DrawPanel(MoveToMouse panel)
 	{
 		this.panel = panel;
+		attack = new JButton("Attack");
+		coin = new JButton("Coin");
 		b1 = new ImageIcon("level1.jpg");
 		b2 = new ImageIcon("level2.jpg");
 		b3 = new ImageIcon("level3.jpg");
@@ -49,7 +55,7 @@ public class DrawPanel
 			case 4: drawPanelFive(g);
 				break;
 			case 5: drawPanelSix(g);
-				break;								
+				break;
 		}
 
 	}
@@ -57,7 +63,8 @@ public class DrawPanel
 	private void drawPanelOne(Graphics g)
 	{
 		panel.removeAll();
-		panel.setBackground(Color.WHITE);
+		//panel.setBackground(Color.WHITE);
+		g.drawImage(background4, 0, 0, panel);
 		/*Component c = panel.getComponentAt(50, 250);
 		if (c != null && c != panel)
 		{
@@ -76,11 +83,12 @@ public class DrawPanel
 
 	private void drawPanelTwo(Graphics g)
 	{
-		panel.setBackground(Color.RED);
-		panel.setLayout(null);
-		button = new JButton("Attack");
-		button.setBounds(50, 250, 50, 50);
-		panel.add(button);
+		g.drawImage(background3, 0, 0, panel);
+		//panel.setBackground(Color.RED);
+		//panel.setLayout(null);
+		//button = new JButton("Attack");
+		//button.setBounds(50, 250, 50, 50);
+		//panel.add(button);
 
 	}
 
@@ -96,13 +104,38 @@ public class DrawPanel
 
 	private void drawPanelFive(Graphics g)
 	{
-		g.drawImage(background3, 0, 0, panel); 
+		Player play = panel.getLocalPlayer();
+		g.drawImage(background1, 0, 0, panel);
+		g.setColor(Color.WHITE);
+		panel.setLayout(null);
+		attack.setBounds(100, 250, 90, 40);
+		attack.addActionListener(this);
+		panel.add(attack);
+		//coin.setBounds(100, 300, 90, 40);
+		//panel.add(coin);
+	}
+
+	public void updateBattle(GameEvent e, Player local, Player enemy)
+	{
+		panel.setLayout(null);
+		label = new JLabel();
+		label.setText("You attacked!");
+		label.setBounds(150, 200, 50, 50);
+		panel.add(label);
 	}
 
 	private void drawPanelSix(Graphics g)
 	{
 		g.drawImage(background4, 0, 0, panel);
-	}	
+	}
+	public void actionPerformed(ActionEvent e)
+	{
+		if (e.getSource() == attack)
+		{
+			panel.sendBattleCommand("attack");
+			//System.out.println("Attacked");
+		}
+	}
 
 
 }

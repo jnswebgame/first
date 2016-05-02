@@ -6,30 +6,38 @@ import java.awt.image.*;
 public class Player implements Serializable
 {
 	private int goldCount;
-	private int x, y, id, atk, def, agi;
+	private int x, y, id, atk = 6, def = 6, agi = 6;
 	int xCurrent = 50, yCurrent = 50, xDestination = 50, yDestination = 50;
 	int tile = 0;
-	int hp =0;
+	int hp = 20;
 	private int xDistance = 0, yDistance = 0, xVel = 0, yVel = 0;
 	private int velocity = 7;
+	private String name;
+	boolean online = true;
 
 	MoveToMouse panel;
 
-	private ImageIcon u = new ImageIcon("linkFront.png"); //there are no fucking pictures of link from the back on the whole internet
-	private ImageIcon d = new ImageIcon("linkFront.png");
-	private ImageIcon r = new ImageIcon("linkRight.png");
-	private ImageIcon l = new ImageIcon("linkLeft.png");
+	static private ImageIcon u = new ImageIcon("linkFront.png"); //there are no fucking pictures of link from the back on the whole internet
+	static private ImageIcon d = new ImageIcon("linkFront.png");
+	static private ImageIcon r = new ImageIcon("linkRight.png");
+	static private ImageIcon l = new ImageIcon("linkLeft.png");
 
-	private Image up = u.getImage().getScaledInstance(20, 20, Image.SCALE_DEFAULT);
-	private Image down = d.getImage().getScaledInstance(20, 20, Image.SCALE_DEFAULT);
-	private Image right = r.getImage().getScaledInstance(20, 20, Image.SCALE_DEFAULT);
-	private Image left = l.getImage().getScaledInstance(20, 20, Image.SCALE_DEFAULT);	
+	static private Image up = u.getImage().getScaledInstance(20, 20, Image.SCALE_DEFAULT);
+	static private Image down = d.getImage().getScaledInstance(20, 20, Image.SCALE_DEFAULT);
+	static private Image right = r.getImage().getScaledInstance(20, 20, Image.SCALE_DEFAULT);
+	static private Image left = l.getImage().getScaledInstance(20, 20, Image.SCALE_DEFAULT);
 
 
 	public String toString()
 	{
 		return "xCurrent: " + xCurrent + " yCurrent" + yCurrent + " xDest " + xDestination + " ID " + id;
 	}
+
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+	public String getName() { return name; }
 
 	public Rectangle getBounds()
 	{
@@ -98,7 +106,7 @@ public class Player implements Serializable
 			}
 		}
 		if(Math.abs(xVel) <= Math.abs(yVel))
-		{	
+		{
 			if(yVel > 0)
 			{
 				g.drawImage(right, xCurrent-10, yCurrent-10, panel);
@@ -144,6 +152,12 @@ public class Player implements Serializable
 		this.yDestination = y;
 		goldCount = 0;
 	}
+	public Player(String name, int id)
+	{
+		this.name = name;
+		goldCount = 0;
+		this.id = id;
+	}
 	public Player()
 	{
 		x = 0; y = 0;
@@ -153,22 +167,22 @@ public class Player implements Serializable
 	{
 		return xCurrent;
 	}
-	public int getHP(){ return hp;}	
+	public int getHP(){ return hp;}
 	public int getAtk(){return atk;}
 	public int getDef(){return def;}
 	public int getAgi() {return agi;}
-	public int getY() { return y; }
+	public int getY() { return yCurrent; }
 	public int getGold() { return goldCount;}
 	public int getId() { return id; }
 	public int getTile() { return tile; }
 
-	
-	public void setHP(int i){this.hp=i;}	
-	public void setX(int x) { this.x = x; }
-	public void setY(int y) { this.y = y; }
+
+	public void setHP(int i){this.hp=i;}
+	public void setX(int x) { this.xCurrent = x; }
+	public void setY(int y) { this.yCurrent = y; }
 	public void setId(int id) { this.id = id; }
-	public void setGold(int g){this.goldCount= g;}		
-	public void setATK(int i){this.atk=i;}	
+	public void setGold(int g){this.goldCount= g;}
+	public void setATK(int i){this.atk=i;}
 	public void setDEF(int i) { this.def = i; }
 	public void setAGI(int i) { this.agi=i;}
 	public void setTile(int t) { this.tile = t; }

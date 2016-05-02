@@ -6,6 +6,7 @@ import java.util.*;
 
 public class Client
 {
+	Scanner scan = new Scanner(System.in);
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
 	private Socket socket;
@@ -15,6 +16,7 @@ public class Client
 	private String server, userName;
 	private int port;
 	private int clientId;
+	private GameState gameState;
 
 	public String getUsername() { return userName; }
 
@@ -58,11 +60,17 @@ public class Client
 		{
 			// Send the server your username, it will send back your client id
 			oos.writeObject(userName);
-			clientId = (int) ois.readObject();
+			// Game state here
+			//scan.nextInt();
+			gameState = (GameState) ois.readObject();
+			clientId = gameState.getClientId();
 			Player new_player = new Player();
 			new_player.setId(clientId);
 			gg.setId(clientId);
-			gg.append(new_player);
+
+
+
+			gg.append(gameState);
 		} catch (Exception e)
 		{
 			display("Error writing name");

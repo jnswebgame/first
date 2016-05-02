@@ -13,14 +13,14 @@ import java.applet.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class CombatPanel implements ActionListener 
-{	
+public class CombatPanel implements ActionListener
+{
 	private JButton attack;
 	private JButton bribe;
 	private JLabel hpDisplay;
 	private JLabel goldAmt;
 	public JLabel message;
-	private Combat combat=new Combat();
+	private Combat combat;
 	//private Player play;
 	private GridLayout barLayout = new GridLayout(1, 5);
 	private GridLayout mainLayout = new GridLayout(1,2);
@@ -32,23 +32,36 @@ public class CombatPanel implements ActionListener
 	//private [thing for player 1]
 	//private [thing for player 2]
 	//private [background image]
-	
-	public CombatPanel()
-	{	
+
+	public static void main(String[] args)
+	{
+		CombatPanel pan = new CombatPanel();
+
 	}
-	
+
+	public CombatPanel()
+	{
+		combat = new Combat(new Player(), new Player(), this);
+		attack = new JButton("Attack");
+		bribe = new JButton("Bribe");
+		hpDisplay = new JLabel("hp");
+		goldAmt = new JLabel("Gold");
+		message = new JLabel("message");
+		hpString = "HP is";
+	}
+
 	public void initiate(Player p1, Player p2)
-	{	
+	{
 		bottomBar(p1);
 		mainScene();
 
 		entireThing.add(mainScene);
 		entireThing.add(bar);
-		
+
 		combat.newBattle(p1, p2);
-		
+
 	}
-	 
+
 	private void bottomBar(Player play)
 	{
 		hpString=play.getHP() + "/30";
@@ -56,12 +69,12 @@ public class CombatPanel implements ActionListener
 		goldAmt = new JLabel(g);
 		hpDisplay=new JLabel(hpString);
 		attack = new JButton("Attack");
-		bribe = new JButton("Bribe");		
+		bribe = new JButton("Bribe");
 		attack.addActionListener(this);
 		bribe.addActionListener(this);
-		
+
 		bar.setSize(500,100);
-		bar.setLayout(barLayout);		
+		bar.setLayout(barLayout);
 		bar.add(bribe);
 		bar.add(attack);
 		bar.add(goldAmt);
@@ -70,18 +83,18 @@ public class CombatPanel implements ActionListener
 	}
 	private void mainScene()
 	{
-	//	the player images are both nonexistent, just some placeholders in the comments here 
+	//	the player images are both nonexistent, just some placeholders in the comments here
 		mainScene.setLayout(mainLayout);
 		mainScene.setSize(500,400);
 		mainScene.setBackground(null); //some image
 		//add player1image
-		//add player2image		
+		//add player2image
 	}
 	protected void updateHP(int hit)
 	{
-		
+
 		bar.remove(hpDisplay);
-		bar.remove(message);	
+		bar.remove(message);
 		String hitpoints=hit + "/30";
 		hpString=hitpoints;
 		hpDisplay=new JLabel(hitpoints);
@@ -91,7 +104,7 @@ public class CombatPanel implements ActionListener
 		{
 			//go to latest non-combat panel
 		}
-		
+
 	}
 	protected void updateGold(int g)
 	{
@@ -111,14 +124,14 @@ public class CombatPanel implements ActionListener
 	protected void updateMessage(String msg)
 	{
 		bar.remove(message);
-		message=new JLabel(msg);		
+		message=new JLabel(msg);
 		bar.add(message);
 	}
 	public JPanel getCombatPanel()
 	{
 		return entireThing;
 	}
-	
+
 	public void actionPerformed(ActionEvent e)
 	{
 		if(e.getSource()==attack)

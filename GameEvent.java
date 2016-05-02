@@ -4,9 +4,11 @@ import java.io.Serializable;
 
 public class GameEvent implements Serializable
 {
-	enum EventType { PLAYER_MOVEMENT, GOLD_SPAWN, GOLD_TAKEN };
+	enum EventType { PLAYER_MOVEMENT, GOLD_SPAWN, GOLD_TAKEN, OFFLINE, INITIATE_COMBAT, BATTLE };
 	private int move_to_x, move_to_y, player_id, gold_id;
 	private int tile, new_tile;
+	int enemy_id;
+	String command;
 
 	private EventType event_type;
 
@@ -33,6 +35,15 @@ public class GameEvent implements Serializable
 		move_to_y = y;
 		event_type = EventType.PLAYER_MOVEMENT;
 		tile = 0;
+	}
+	public GameEvent(String e)
+	{
+		command = e;
+	}
+
+	public GameEvent(EventType event)
+	{
+		this.event_type = event;
 	}
 
 	public GameEvent(int x, int y, EventType event)
